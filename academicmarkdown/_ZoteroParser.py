@@ -146,6 +146,8 @@ class ZoteroParser(BaseParser):
 		regexp =  r'[^\w\s-]@([^ ?!,.\t\n\r\f\v\]\[;]+)'
 		for r in re.finditer(regexp, md):
 			queryString = r.groups()[0]
+			if queryString == 'TODO':
+				continue
 			self.msg(u'Found citation (#%d) "%s"' % (self.refCount,
 				queryString))
 			if queryString in oldQueries:
@@ -156,11 +158,10 @@ class ZoteroParser(BaseParser):
 				self.msg(u'No matches for "%s"!' % queryString)
 				continue
 			if len(matches) > 1:
+				self.msg(u'Multiple matches for @%s!' % queryString)
 				for match in matches:
 					print(match)
-				raise Exception( \
-					u'Multiple Zotero matches (%d) for "@%s". Be more specific!' % \
-					(len(matches), queryString))
+				continue
 			match = matches[0]
 			if match in items and queryString not in oldQueries:
 				for _queryString in sorted(oldQueries):
