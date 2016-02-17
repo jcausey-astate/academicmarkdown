@@ -40,13 +40,15 @@ class YAMLParser(BaseParser):
 		
 		self._object = _object
 		self.required = required
+		self.first_block = True
 		super(YAMLParser, self).__init__(verbose=verbose)
 	
 	def parse(self, md):
 		
 		"""See BaseParser.parse()."""
-		
-		for r in re.finditer(u'%--(.*?)--%', md, re.M|re.S):
+
+		found_first_block = False
+		for r in re.finditer(u'[%-]---?(.*?)-?--[%-]', md, re.M|re.S):
 			try:
 				d = yaml.load(r.groups()[0])
 			except:
@@ -55,6 +57,12 @@ class YAMLParser(BaseParser):
 			if not isinstance(d, dict):
 				continue
 			obj = list(d.keys())[0]
+			else:
+				if self.first_block:
+					d = {'constant': d}
+					found_first_block = True
+
+			obj = d.keys()[0]
 			if obj.lower() != self._object:
 				continue
 			keys = d[obj]
@@ -64,6 +72,11 @@ class YAMLParser(BaseParser):
 						u'"%s" is a required option for %s objects' % (key, \
 						self._object))
 			md = self.parseObject(md, r.group(), keys)
+			if self.first_block and found_first_block:
+				md = self.parseObject(md, '', keys)
+				self.first_block = False;
+			else:
+				md = self.parseObject(md, r.group(), keys)
 		return md
 	
 	def parseObject(self, md, _yaml, d):
