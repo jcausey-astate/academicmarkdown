@@ -289,13 +289,28 @@ class ZoteroParser(BaseParser):
 				elif u'doi' in item:
 					doi = item[u'doi'][:]
 				else:
+					# Zotero places DOI in the "Extra" field for i.e. books.
+					# This will arrive in the 'note' field.
+					note = ""
+					if u'note' in item:
+						note = item[u'note']
+					elif u'Note' in item:
+						note = item[u'Note']
 					doi = None
-					self.msg('Missing DOI: %s' % item[u'title'])
+					if note != "":
+						# DOI regex from http://stackoverflow.com/a/10324802
+						doi_regexp  = r'\b(10[.][0-9]{4,}(?:[.][0-9]+)*/(?:(?!["&\'<>])\S)+)\b'
+						doi_p       = re.compile(doi_regexp)
+						doi_match   = doi_p.search(note)
+						if doi_match != None:
+							doi         = doi_match.group()
 				if doi is not None:
 					if doi.startswith(u'doi:'):
 						doi = doi[4:]
 					doi = doi.lower()
 					item[u'doi'] = item[u'DOI'] = doi
+				else:
+					self.msg('Missing DOI: %s' % item[u'title'])
 			# Remove URL field
 			if self.removeURL:
 				if u'URL' in item.keys() and (u'container-title' in \
