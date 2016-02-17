@@ -143,7 +143,7 @@ class ZoteroParser(BaseParser):
 
 		items = []
 		oldQueries = []
-		regexp =  r'@([^ ?!,.\t\n\r\f\v\]\[;]+)'
+		regexp =  r'[^\w\s-]@([^ ?!,.\t\n\r\f\v\]\[;]+)'
 		for r in re.finditer(regexp, md):
 			queryString = r.groups()[0]
 			self.msg(u'Found citation (#%d) "%s"' % (self.refCount,
