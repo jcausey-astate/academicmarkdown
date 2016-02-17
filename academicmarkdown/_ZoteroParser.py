@@ -231,7 +231,7 @@ class ZoteroParser(BaseParser):
 					pass
 				# Check authors
 				if matchPhase == 0:
-					if 'author' not in item:
+					if u'author' not in item:
 						break
 					if i >= len(item[u'author']):
 						match = False

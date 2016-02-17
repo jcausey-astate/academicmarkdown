@@ -56,7 +56,7 @@ class YAMLParser(BaseParser):
 				continue
 			if not isinstance(d, dict):
 				continue
-			obj = list(d.keys())[0]
+				obj = list(d.keys())[0]
 			else:
 				if self.first_block:
 					d = {'constant': d}
